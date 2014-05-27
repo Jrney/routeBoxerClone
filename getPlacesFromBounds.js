@@ -1,33 +1,43 @@
+//"PRC" is Places Request Count
+var PRC = 0;
+
 //  make the following function with bounds object
-function getZoom() {
-    myZoom = map.zoom;
-    return myZoom;
-}
+// function getZoom() {
+//     myZoom = initalizedMap.zoom;
+//     return myZoom;
+// }
 
+/*
+the following code makes Google Places requests for every box on the
+route. The first time you call the function, you move from 1-10. The
+next time it's called,it makes requests for boxes 11-20. And so on,
+until the boxes run out. Then it starts the loop again.
+
+Edge case: If the number of boxes is not a multiple of 10, then there
+will be a left-over chunk at the end of the array that is a number from 1-9,
+we account for this using the modulo.
+*/
+//dependency for initalizedMap, & GoogleBounds(from getGoogleBoundsFast.js)
 function getPlacesFromBounds(bounds) {
-
     PRC += 1;
-    console.log('LOUD NOTE!!!!!!' + PRC);
-    service = new google.maps.places.PlacesService(map);
+    console.log('Places Request Count' + PRC);
+    service = new google.maps.places.PlacesService(initializedMap);
     var googleBounds = [];
     googleBounds = bounds;
     console.log('googleBounds: ' + googleBounds);
-    //make a variable that stores where we are in the places request
-    //(googleBounds.length)-(googleBounds.length-10)
-    //var first10 = (googleBounds.length) - (googleBounds.length - 10);
-    //console.log('FIRST 10' + first10);
-    //for (i=currentIndex-10;i<currentIndex;i+=1)
 
-
+//if the number of boxes is more than 10,
     if (googleBounds.length > 10) {
+        //refactor if/else statement to be two different functions.
         var currentIndex = PRC * 10;
         console.log('currentIndex: ' + currentIndex);
-        console.log('polys modulus' + googleBounds.length % 10);
-        if (googleBounds.length < currentIndex - (googleBounds.length + 1 % 10)) {
+
+        if (googleBounds.length < currentIndex - (googleBounds.length % 10)) {
 
             PRC = 1;
             currentIndex = PRC * 10;
         }
+
 
         for (i = currentIndex - 10; i < currentIndex; i += 1) {
             var myBounds = [];
@@ -48,7 +58,7 @@ function getPlacesFromBounds(bounds) {
             };
             //service.radarSearch(request, callback);
             //service.nearbySearch(request, callback);
-            if (map.zoom > 5) {
+            if (map.zoom > 6) {
                 service.nearbySearch(request, nearbyCallback);
             } else {
                 service.radarSearch(request, radarCallback);
